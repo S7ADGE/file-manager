@@ -2,6 +2,20 @@ from pathlib import Path
 import hashlib
 
 
+def ans(prompt, answer=["y", "n"]):
+    """Prompt the user until they enter a value that exists in the allowed answer list."""
+
+    ans = input(prompt).lower().replace(" ", "")
+
+    # Keep asking until the input matches one of the allowed answers
+    while ans not in answer:
+        
+        print(f"\n\tInvalid selection. Please choose an item from the {answer}")
+        ans = input(prompt).lower().replace(" ", "")
+
+    return ans
+
+
 def choose_action():
     """Prompt the user to select a menu option and return the validated choice."""
 
@@ -9,14 +23,7 @@ def choose_action():
     print("\t1. Display the files and folders in the specified path")
     print("\t2. Find duplicate files")
     print("\t3. Do both")
-
-    choise = input("\nEnter your choice (1, 2, or 3) : ").replace(" ", "")
-
-    # Keep asking until the user provides a valid choice
-    while choise not in ["1", "2", "3"]:
-
-        print("\t\nInvalid choice! Please choose 1, 2, or 3.")
-        choise = input("\nEnter your choice (1, 2, or 3) : ").replace(" ", "")
+    choise = ans("\nEnter your choice (1, 2, or 3) : ", ["1", "2", "3"])
 
     return choise
 
@@ -30,6 +37,7 @@ def action():
     if choise == "3":
         # Run both operations
         show_content()
+        print("\n", "-" * 77)
         show_duplicate()
 
     else:
@@ -128,13 +136,16 @@ def same_hash():
     return hash_dic
 
 
+# Module-level list holding the duplicate files found across calls to duplicate()
+duplicate_list = []
+
+
 def duplicate():
     """Compare file hashes and return a list of names of truly duplicate files."""
 
     same = same_hash()
     hash_list = []
-    duplicate_list = []
-
+    
     for key, value in same.items():
 
         # If this hash has already been seen, the file is a duplicate
@@ -151,17 +162,18 @@ def show_duplicate():
     """Print the list of duplicate files found."""
 
     duplicate_file = duplicate()
-    print("\n", "-" * 77, "\n")
-    print("Duplicate Files : \n")
+    print("\nDuplicate Files : \n")
+    duplicate_file_del = []
 
     if duplicate_file == []:
 
         print("\tNo duplicate files were found in this path!")
 
-    for file in duplicate_file:
+    else:
 
-        print("\t", file)
+        for file in duplicate_file:
 
+            print("\t", file)
 
 # ---- Main program execution ----
 
