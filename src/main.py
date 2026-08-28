@@ -2,18 +2,18 @@ from pathlib import Path
 import hashlib
 
 
-def ans(prompt, answer=["y", "n"]):
+def get_valid_input(prompt = str, answer= list[str]):
     """Prompt the user until they enter a value that exists in the allowed answer list."""
 
-    ans = input(prompt).lower().replace(" ", "")
+    choise = input(prompt).lower().replace(" ", "")
 
     # Keep asking until the input matches one of the allowed answers
-    while ans not in answer:
+    while choise not in answer:
         
         print(f"\n\tInvalid selection. Please choose an item from the {answer}")
-        ans = input(prompt).lower().replace(" ", "")
+        choise = input(prompt).lower().replace(" ", "")
 
-    return ans
+    return choise
 
 
 def choose_action():
@@ -21,9 +21,9 @@ def choose_action():
 
     print("\nWhat would you like to do?\n")
     print("\t1. Display the files and folders in the specified path")
-    print("\t2. Find duplicate files")
+    print("\t2. Find and delete duplicate files")
     print("\t3. Do both")
-    choise = ans("\nEnter your choice (1, 2, or 3) : ", ["1", "2", "3"])
+    choise = get_valid_input("\nEnter your choice (1, 2, or 3) : ", ["1", "2", "3"])
 
     return choise
 
@@ -39,7 +39,7 @@ def action():
         show_content()
         print("\n", "-" * 77)
         show_duplicate()
-
+        
     else:
 
         if choise == "1":
@@ -49,29 +49,43 @@ def action():
         else:
             # Only show duplicate files
             show_duplicate()
-
+            
 
 def show_content():
     """Print the names of all folders and files found in the given path."""
 
-    print("\nDiratories : \n")
+    print("\nFolder(s) : \n")
+    a = 0
 
     # Print directory names
     for item in folder.iterdir():
 
-        if item.is_dir():
+       if item.is_dir():
 
+            a += 1
             print("\t", item.name)
 
+    # Notify the user if no subfolders exist
+    if a == 0:
+
+        print("\t No folders found in the specified path.")
+
     print("\n", "-" * 77, "\n")
-    print("Files : ")
+    print("File(s) : ")
+    b = 0
 
     # Print file names
     for item in folder.iterdir():
 
         if item.is_file():
 
+            b += 1
             print("\t", item.name)
+
+    # Notify the user if no files exist
+    if b == 0:
+
+        print("\t No files found in the specified path.")
 
 
 def size():
@@ -136,12 +150,12 @@ def same_hash():
     return hash_dic
 
 
-# Module-level list holding the duplicate files found across calls to duplicate()
+# Module-level list holding the duplicate file paths found across calls to duplicate()
 duplicate_list = []
 
 
 def duplicate():
-    """Compare file hashes and return a list of names of truly duplicate files."""
+    """Compare file hashes and return a list of Path objects for the duplicate files."""
 
     same = same_hash()
     hash_list = []
@@ -151,7 +165,7 @@ def duplicate():
         # If this hash has already been seen, the file is a duplicate
         if value in hash_list:
 
-            duplicate_list.append(key.name)
+            duplicate_list.append(key)
 
         hash_list.append(value)
 
@@ -159,21 +173,44 @@ def duplicate():
 
 
 def show_duplicate():
-    """Print the list of duplicate files found."""
+    """Print the list of duplicate files found, then offer to delete them."""
 
     duplicate_file = duplicate()
-    print("\nDuplicate Files : \n")
+    print("\nDuplicate File(s) : \n")
     duplicate_file_del = []
 
     if duplicate_file == []:
 
-        print("\tNo duplicate files were found in this path!")
+        print("\tNo duplicate files found.")
 
     else:
 
         for file in duplicate_file:
 
-            print("\t", file)
+            print("\t", file.name)
+
+        delete()
+            
+
+def delete():
+    """Ask the user for confirmation, then delete the duplicate files if confirmed."""
+
+    print("\n=================================== DELETE ===================================")
+    q = get_valid_input("\nDo yo want to delete the duplicate file(s)? (y/N) : ", ["y", "n"])
+
+    if q == "y":
+
+        # Remove every duplicate file found earlier
+        for file in duplicate_list:
+
+            file.unlink()
+
+        print("\n\t\t Duplicate file(s) deleted successfully ! ")
+
+    else:
+
+        print("\n\t\tDeletion cancelled. No file(s) have been deleted !")
+
 
 # ---- Main program execution ----
 
