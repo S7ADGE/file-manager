@@ -162,7 +162,7 @@ def delete_files(files: list[Path]):
     """Ask the user for confirmation, then delete the duplicate files if confirmed."""
 
     print("\n=================================== DELETE ===================================")
-    choice = get_valid_input("\nDo yo want to delete the duplicate file(s)? (y/N) : ", ["y", "n"])
+    choice = get_valid_input("\nDo you want to delete the duplicate file(s)? (y/N) : ", ["y", "n"])
 
     if choice == "y":
 
